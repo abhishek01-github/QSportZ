@@ -36,6 +36,7 @@ public class UserDTO {
     @URL(message = "Profile photo URL must be valid")
     private String profilePhotoUrl;
 
+    private String passwordHash;
     private Long schoolId;
 }
 

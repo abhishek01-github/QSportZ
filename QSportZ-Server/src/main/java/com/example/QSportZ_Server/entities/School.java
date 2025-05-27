@@ -1,10 +1,12 @@
 package com.example.QSportZ_Server.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "schools")
-public class School {
+public class School extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

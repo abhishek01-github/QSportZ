@@ -2,9 +2,15 @@ package com.example.QSportZ_Server.entities;
 
 import com.example.QSportZ_Server.enums.MatchResult;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Data                           // ← add this
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "matches")
 public class Match extends BaseEntity {
@@ -20,8 +26,10 @@ public class Match extends BaseEntity {
     private School schoolB;
 
     @Enumerated(EnumType.STRING)
-    private MatchResult winner; // enum MatchResult { SCHOOL_A, SCHOOL_B, DRAW }
+    private MatchResult winner;
 
     private LocalDate matchDate;
-    private String description;
+
+    @Column(length = 20)
+    private String score;
 }

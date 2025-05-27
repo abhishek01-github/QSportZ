@@ -1,7 +1,13 @@
 package com.example.QSportZ_Server.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
+@Data                           // ← add this
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "videos")
 public class Video extends BaseEntity {

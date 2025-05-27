@@ -16,7 +16,6 @@ public class VideoDTO {
     @NotBlank(message = "Title is required")
     private String title;
 
-    @NotBlank(message = "Video URL is required")
     @URL(message = "Invalid video URL")
     private String videoUrl;
 

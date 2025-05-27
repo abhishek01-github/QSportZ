@@ -1,5 +1,6 @@
 package com.example.QSportZ_Server.models;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -23,8 +24,8 @@ public class MatchDTO {
     @NotNull(message = "Second school ID is required")
     private Long schoolTwoId;
 
-    @Pattern(regexp = "WON|LOSS|DRAW", message = "Result must be WON, LOSS, or DRAW")
-    private String result;
+    private String winnerSchoolName;
 
+    @NotBlank(message = "Score is required")
     private String score; // e.g., "2-1"
 }

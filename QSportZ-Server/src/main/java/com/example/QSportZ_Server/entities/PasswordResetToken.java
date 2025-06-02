@@ -11,13 +11,10 @@ public class PasswordResetToken {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
     private String token;
+    private LocalDateTime expiresAt;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
-
-    @Column(nullable = false)
-    private LocalDateTime expiresAt;
 }

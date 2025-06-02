@@ -77,15 +77,28 @@ public class AuthenticationService {
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("No user with that email"));
 
-        // generate token
-        String token = UUID.randomUUID().toString();
-        PasswordResetToken prt = new PasswordResetToken(
-                null, token, user, LocalDateTime.now().plus(EXPIRE_DURATION)
-        );
+        // Generate a fresh token and expiry
+        String newToken = UUID.randomUUID().toString();
+        LocalDateTime newExpiry = LocalDateTime.now().plus(EXPIRE_DURATION);
+
+        // Look up any existing token for this user
+        PasswordResetToken prt = tokenRepo.findByUser(user)
+                .map(existing -> {
+                    // Update the existing record
+                    existing.setToken(newToken);
+                    existing.setExpiresAt(newExpiry);
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    // No record yet: create a new one
+                    return new PasswordResetToken(null, newToken, newExpiry, user);
+                });
+
+        // Save (either updates or inserts)
         tokenRepo.save(prt);
 
-        // send email
-        String link = "http://localhost:3000/reset-password?token=" + token;
+        // Send the email
+        String link = "http://localhost:5173/reset-password?token=" + newToken;
         emailSender.send(
                 email,
                 "QSportz Password Reset",

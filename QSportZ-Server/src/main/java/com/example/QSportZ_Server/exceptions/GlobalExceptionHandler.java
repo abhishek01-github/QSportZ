@@ -52,19 +52,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
-    // 3) Payload too large
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    protected ResponseEntity<Object> handleMaxSize(MaxUploadSizeExceededException ex) {
-        ApiError apiError = new ApiError(
-                HttpStatus.PAYLOAD_TOO_LARGE.value(),
-                "Payload Too Large",
-                "File exceeds maximum allowed size",
-                LocalDateTime.now(),
-                List.of(ex.getMessage())
-        );
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(apiError);
-    }
-
     // 4) Unsupported media type (override)
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(

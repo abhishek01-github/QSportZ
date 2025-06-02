@@ -1,0 +1,22 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 50"
+  width="200" height="50"
+>
+  <!-- 1) Define the mask using your cleaned PNG -->
+  <mask id="logo-mask" x="0" y="0" width="200" height="50" maskUnits="userSpaceOnUse">
+    <!-- Make the letters opaque in the mask, background transparent -->
+    <image
+      href="qsportz-logo-clean.png"
+      x="0" y="0" width="200" height="50"
+      preserveAspectRatio="xMidYMid meet"
+    />
+  </mask>
+
+  <!-- 2) Draw a rect filled with currentColor, clipped by the mask -->
+  <rect
+    x="0" y="0" width="200" height="50"
+    fill="currentColor"
+    mask="url(#logo-mask)"
+  />
+</svg>

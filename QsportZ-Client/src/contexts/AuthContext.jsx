@@ -1,59 +1,61 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import api from "../api";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../api"; // make sure axios baseURL is "/api"
 
-// 1) Create the context
-const AuthContext = createContext({
-  token: null,
-  login: async () => {},
-  logout: () => {},
-  setToken: () => {},
-});
+const AuthContext = createContext();
 
-// 2) Provider component
 export function AuthProvider({ children }) {
-  const [token, setTokenState] = useState(null);
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // On mount, load any existing token from localStorage
+  // On mount: load token & fetch /auth/me
   useEffect(() => {
-    const stored = localStorage.getItem("token");
-    if (stored) {
-      setTokenState(stored);
-      api.defaults.headers.Authorization = `Bearer ${stored}`;
+    const savedToken = localStorage.getItem("qsportz_token");
+    if (savedToken) {
+      api.defaults.headers.common["Authorization"] = `Bearer ${savedToken}`;
+      api
+        .get("/auth/me")
+        .then((resp) => {
+          setUser(resp.data);
+          setToken(savedToken);
+        })
+        .catch(() => {
+          localStorage.removeItem("qsportz_token");
+          delete api.defaults.headers.common["Authorization"];
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
   }, []);
 
-  // Wrap setting token so we also persist & set axios header
-  const setToken = (newToken) => {
-    if (newToken) {
-      localStorage.setItem("token", newToken);
-      api.defaults.headers.Authorization = `Bearer ${newToken}`;
-      setTokenState(newToken);
-    } else {
-      localStorage.removeItem("token");
-      delete api.defaults.headers.Authorization;
-      setTokenState(null);
-    }
+  const login = async (newToken) => {
+    localStorage.setItem("qsportz_token", newToken);
+    api.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+    const resp = await api.get("/auth/me");
+    setUser(resp.data);
+    setToken(newToken);
   };
 
-  // login: call your /auth/login endpoint, set token
-  const login = async ({ email, password }) => {
-    const { data } = await api.post("/auth/login", { email, password });
-    setToken(data.token);
-  };
-
-  // logout: clear token
   const logout = () => {
     setToken(null);
+    setUser(null);
+    localStorage.removeItem("qsportz_token");
+    delete api.defaults.headers.common["Authorization"];
   };
 
+  if (loading)
+    return <div className="p-4 text-center text-white">Loading…</div>;
+
   return (
-    <AuthContext.Provider value={{ token, login, logout, setToken }}>
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// 3) Custom hook for easy consumption
 export function useAuth() {
-  return useContext(AuthContext);
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
+  return ctx;
 }

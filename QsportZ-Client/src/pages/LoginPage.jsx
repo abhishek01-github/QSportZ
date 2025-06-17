@@ -6,7 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setToken } = useAuth();
+  const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
     setError("");
     try {
       const { data } = await api.post("/auth/login", form);
-      setToken(data.token);
+      login(data.token);
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

@@ -1,37 +1,40 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import "./App.css";
-import RegisterPage from "./pages/RegisterPage";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import Layout from "./components/Layout";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import HomePage from "./pages/HomePage";
 
-function App() {
+import DashboardRoutes from "./dashboard/routes";
+import Layout from "./components/Layout";
+import Unauthorized from "./components/Unauthorized";
+
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/home" element={<HomePage />} />
-        {/* Protected routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }>
-          <Route index element={<HomePage />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <ToastContainer position="top-right" />
+        <Routes>
+          {/* ─── Public ────────────────────────────────────────────── */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard/*" element={<DashboardRoutes />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;

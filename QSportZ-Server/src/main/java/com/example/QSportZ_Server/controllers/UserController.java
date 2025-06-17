@@ -1,6 +1,9 @@
 package com.example.QSportZ_Server.controllers;
 
+import com.example.QSportZ_Server.entities.User;
+import com.example.QSportZ_Server.exceptions.ResourceNotFoundException;
 import com.example.QSportZ_Server.models.UserDTO;
+import com.example.QSportZ_Server.repositories.UserRepository;
 import com.example.QSportZ_Server.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +23,26 @@ import java.util.List;
 @Validated
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/{id}/photo-url")
+    public ResponseEntity<String> getPhotoUrl(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        String fullUrl = user.getProfilePhotoUrl();
+        if (fullUrl == null || fullUrl.isEmpty()) {
+            throw new ResourceNotFoundException("No profile photo found for user id: " + id);
+        }
+
+        String key = fullUrl.substring(fullUrl.indexOf("profiles/"));
+        String presignedUrl = userService.generatePresignedUrl(key);
+        return ResponseEntity.ok().body(presignedUrl);
     }
 
     @GetMapping
